@@ -1,9 +1,22 @@
 package org.gestionobjets.models;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "utilisateurs")
 public class Utilisateur {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false, name = "nom")
     private String nom;
+
+    @Column(nullable = false,name = "email")
     private String email;
+
+    @Column(nullable = false,name = "mdp")
     private String motDePasse;
 
     public Utilisateur(int id, String nom, String email, String motDePasse) {
