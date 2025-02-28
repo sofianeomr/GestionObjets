@@ -1,4 +1,4 @@
-package org.gestionobjets.gestionobjets;
+package org.gestionobjets;
 
 import java.io.*;
 

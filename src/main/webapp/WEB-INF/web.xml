@@ -23,7 +23,7 @@
     <!-- Déclaration du servlet -->
     <servlet>
         <servlet-name>HelloServlet</servlet-name>
-        <servlet-class>org.gestionobjets.gestionobjets.HelloServlet</servlet-class>
+        <servlet-class>org.gestionobjets.HelloServlet</servlet-class>
     </servlet>
 
     <!-- Mapping du servlet : /hello -->

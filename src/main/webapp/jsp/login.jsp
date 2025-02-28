@@ -1,26 +1,35 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: sofia
-  Date: 28/02/2025
-  Time: 10:11
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Connexion</title>
+    <title>Login Page</title>
+    <!-- Lien vers le CSS -->
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css" />
 </head>
 <body>
-<form action="${pageContext.request.contextPath}/login" method="post">
-    <label>Email :</label>
-    <input type="text" name="email" required />
-    <br/>
-    <label>Mot de passe :</label>
-    <input type="password" name="password" required />
-    <br/>
-    <input type="submit" value="Se connecter" />
-</form>
+
+<div class="form-container">
+    <%
+        // Si on reçoit un paramètre error=1, on affiche un message d'erreur
+        String errorParam = request.getParameter("error");
+        if ("1".equals(errorParam)) {
+    %>
+    <p class="error-message">Identifiants invalides !</p>
+    <%
+        }
+    %>
+
+    <h2>Login</h2>
+    <form action="<%=request.getContextPath() %>/hello" method="post">
+        <label for="username">Nom d'utilisateur :</label>
+        <input type="text" name="username" id="username" />
+
+        <label for="password">Mot de passe :</label>
+        <input type="password" name="password" id="password" />
+
+        <button type="submit">Se connecter</button>
+    </form>
+</div>
+
 </body>
 </html>
-
