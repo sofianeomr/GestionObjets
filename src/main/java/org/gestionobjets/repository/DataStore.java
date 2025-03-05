@@ -2,14 +2,14 @@ package org.gestionobjets.repository;
 
 import org.gestionobjets.models.Utilisateur;
 import org.gestionobjets.models.Objet;
-import org.gestionobjets.models.Echange;
+import org.gestionobjets.models.Exchange;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataStore {
     public static List<Utilisateur> utilisateurs = new ArrayList<>();
     public static List<Objet> objets = new ArrayList<>();
-    public static List<Echange> echanges = new ArrayList<>();
+    public static List<Exchange> echanges = new ArrayList<>();
 
     public static Utilisateur findUtilisateurByEmail(String email) {
         for (Utilisateur u : utilisateurs) {
@@ -49,7 +49,7 @@ public class DataStore {
         return results;
     }
 
-    public static void addEchange(Echange echange) {
+    public static void addEchange(Exchange echange) {
         echanges.add(echange);
     }
 }

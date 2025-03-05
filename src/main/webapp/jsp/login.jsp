@@ -20,15 +20,16 @@
     %>
 
     <h2>Login</h2>
-    <form action="<%=request.getContextPath() %>/hello" method="post">
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" name="username" id="username" />
+    <form action="HelloServlet?action=login" method="post">
+        <label>Email :</label>
+        <input type="email" name="email" required />
 
-        <label for="password">Mot de passe :</label>
-        <input type="password" name="password" id="password" />
+        <label>Mot de passe :</label>
+        <input type="password" name="motDePasse" required />
 
         <button type="submit">Se connecter</button>
     </form>
+
 </div>
 
 </body>

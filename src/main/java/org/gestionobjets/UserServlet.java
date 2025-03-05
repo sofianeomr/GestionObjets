@@ -1,19 +1,24 @@
 package org.gestionobjets;
 
-import java.io.*;
-import java.util.List;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-import org.gestionobjets.dao.ExchangeDAO;
-import org.gestionobjets.dao.ObjectDAO;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.gestionobjets.dao.UserDAO;
+import org.gestionobjets.dao.ObjectDAO;
+import org.gestionobjets.dao.ExchangeDAO;
 import org.gestionobjets.models.Exchange;
-import org.gestionobjets.models.Objet;
 import org.gestionobjets.models.Utilisateur;
+import org.gestionobjets.models.Objet;
 
-public class HelloServlet extends HttpServlet {
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/userServlet")
+public class UserServlet extends HttpServlet {
+
     private UserDAO userDAO;
     private ObjectDAO objectDAO;
     private ExchangeDAO exchangeDAO;
@@ -212,3 +217,4 @@ public class HelloServlet extends HttpServlet {
         request.getRequestDispatcher("history.jsp").forward(request, response);
     }
 }
+

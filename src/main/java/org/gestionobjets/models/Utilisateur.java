@@ -13,12 +13,24 @@ public class Utilisateur {
     @Column(nullable = false, name = "nom")
     private String nom;
 
-    @Column(nullable = false,name = "email")
+    @Column(nullable = false, name = "email")
     private String email;
 
-    @Column(nullable = false,name = "mdp")
+    @Column(nullable = false, name = "mdp")
     private String motDePasse;
 
+    // 🔹 Constructeur sans argument requis par JPA
+    public Utilisateur() {
+    }
+
+    // 🔹 Constructeur avec 3 paramètres
+    public Utilisateur(String nom, String email, String motDePasse) {
+        this.nom = nom;
+        this.email = email;
+        this.motDePasse = motDePasse;
+    }
+
+    // 🔹 Constructeur avec 4 paramètres (si besoin)
     public Utilisateur(int id, String nom, String email, String motDePasse) {
         this.id = id;
         this.nom = nom;
