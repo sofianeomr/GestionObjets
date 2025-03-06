@@ -1,6 +1,9 @@
 package org.gestionobjets.dao;
 
+import org.gestionobjets.models.Categorie;
 import org.gestionobjets.models.Exchange;
+import org.gestionobjets.models.Objet;
+import org.gestionobjets.models.Utilisateur;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +15,11 @@ import java.util.List;
 public class ExchangeDAO {
 
     private Connection connection;
-
+    public enum Statut {
+        EN_ATTENTE,
+        ACCEPTE,
+        REFUSE
+    }
     public ExchangeDAO() {
         this.connection = ConnexionDatabase.getConnection();
     }
@@ -57,24 +64,63 @@ public class ExchangeDAO {
             return false;
         }
     }
-
     public List<Exchange> getUserExchangeHistory(int userId) {
         List<Exchange> history = new ArrayList<>();
-        String query = "SELECT * FROM echanges WHERE demandeurId = ? OR proprietaireId = ?";
+        String query = "SELECT e.*, o.id AS objetId, o.nom AS objetNom, o.description AS objetDescription, " +
+                "u.id AS proprietaireId, u.nom AS proprietaireNom " +
+                "FROM echanges e " +
+                "JOIN objets o ON e.objetDemandeId = o.id " +
+                "JOIN utilisateurs u ON o.proprietaireId = u.id " +
+                "WHERE e.demandeurId = ? OR o.proprietaireId = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, userId);
             stmt.setInt(2, userId);
             ResultSet rs = stmt.executeQuery();
+
             while (rs.next()) {
-                history.add(new Exchange(rs.getInt("id"),
-                        rs.getInt("demandeurId"),
+                // Créez une instance de Categorie
+                Categorie categorie = new Categorie(rs.getString("categorieNom"));
+
+                // Créez une instance de Utilisateur
+                Utilisateur proprietaire = new Utilisateur(
                         rs.getInt("proprietaireId"),
+                        rs.getString("proprietaireNom"),
+                        "", // email non nécessaire ici
+                        ""  // motDePasse non nécessaire ici
+                );
+
+                // Créez une instance de Objet
+                Objet objetDemande = new Objet(
                         rs.getInt("objetId"),
-                        rs.getString("statut")));
+                        rs.getString("objetNom"),
+                        rs.getString("objetDescription"),
+                        categorie,
+                        proprietaire
+                );
+
+                // Créez une instance de Utilisateur pour le demandeur
+                Utilisateur demandeur = new Utilisateur(
+                        rs.getInt("demandeurId"),
+                        "", // nom non nécessaire ici
+                        "", // email non nécessaire ici
+                        ""  // motDePasse non nécessaire ici
+                );
+
+                // Créez une instance de Exchange
+                Exchange exchange = new Exchange(
+                        null, // objetPropose non nécessaire ici
+                        objetDemande,
+                        demandeur
+                );
+
+                history.add(exchange);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return history;
     }
+
 }

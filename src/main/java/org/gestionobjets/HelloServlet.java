@@ -1,18 +1,19 @@
 package org.gestionobjets;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import org.gestionobjets.dao.ExchangeDAO;
 import org.gestionobjets.dao.ObjectDAO;
 import org.gestionobjets.dao.UserDAO;
+import org.gestionobjets.models.Categorie;
 import org.gestionobjets.models.Exchange;
 import org.gestionobjets.models.Objet;
 import org.gestionobjets.models.Utilisateur;
 
+@WebServlet("/HelloServlet")
 public class HelloServlet extends HttpServlet {
     private UserDAO userDAO;
     private ObjectDAO objectDAO;
@@ -77,16 +78,15 @@ public class HelloServlet extends HttpServlet {
         String nom = request.getParameter("nom");
         String email = request.getParameter("email");
         String motDePasse = request.getParameter("password");
-        //String motDePasse = request.getParameter("motDePasse");
 
         Utilisateur utilisateur = new Utilisateur(nom, email, motDePasse);
         boolean success = userDAO.registerUser(utilisateur);
 
         if (success) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("jsp/login.jsp");
         } else {
             request.setAttribute("errorMessage", "Erreur lors de l'inscription.");
-            request.getRequestDispatcher("registration.jsp").forward(request, response);
+            request.getRequestDispatcher("jsp/registration.jsp").forward(request, response);
         }
     }
 
@@ -104,8 +104,6 @@ public class HelloServlet extends HttpServlet {
             List<Objet> objets = objectDAO.getAllObjets();
             request.setAttribute("objects", objets);
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-
-            response.sendRedirect("dashboard.jsp");
         } else {
             request.setAttribute("errorMessage", "Email ou mot de passe incorrect.");
             request.getRequestDispatcher("login.jsp").forward(request, response);
@@ -116,9 +114,9 @@ public class HelloServlet extends HttpServlet {
     private void createObject(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Utilisateur Utilisateur = (Utilisateur) session.getAttribute("utilisateur");
+        Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
 
-        if (Utilisateur == null) {
+        if (utilisateur == null) {
             response.sendRedirect("login.jsp");
             return;
         }
@@ -126,17 +124,13 @@ public class HelloServlet extends HttpServlet {
         String nom = request.getParameter("nom");
         String categorie = request.getParameter("categorie");
         String description = request.getParameter("description");
-        //String proprietaire= request.getParameter("proprietaire");
 
-        Objet objet = new Objet(nom, categorie, description, Utilisateur.getId());
+        Objet objet = new Objet(nom, description,new Categorie(categorie),  utilisateur);
         objectDAO.addObject(objet);
 
         List<Objet> objets = objectDAO.getAllObjets();
         request.setAttribute("objects", objets);
         request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-
-
-        response.sendRedirect("dashboard.jsp");
     }
 
     /*** 4. Liste des objets ***/
@@ -153,7 +147,7 @@ public class HelloServlet extends HttpServlet {
         String keyword = request.getParameter("keyword");
         List<Objet> objets = objectDAO.searchObjects(keyword);
         request.setAttribute("objects", objets);
-        request.getRequestDispatcher("objets.jsp").forward(request, response);
+        request.getRequestDispatcher("objects.jsp").forward(request, response);
     }
 
     /*** 6. Demande d'échange ***/
@@ -171,19 +165,17 @@ public class HelloServlet extends HttpServlet {
         int ownerId = Integer.parseInt(request.getParameter("ownerId"));
 
         Objet objetPropose = objectDAO.getObjectById(objectId);
-        //Objet objetDemande = objectDAO.getObjectByOwnerId(ownerId);
-        Objet objetDemande = objectDAO.getObjectById(objectId);
-
+        Objet objetDemande = objectDAO.getObjectById(ownerId);
 
         if (objetPropose == null || objetDemande == null) {
             response.sendRedirect("error.jsp");
             return;
         }
 
-        Exchange exchange = new Exchange(utilisateur, objetPropose, objetDemande);
+        Exchange exchange = new Exchange(objetPropose, objetDemande, utilisateur);
         exchangeDAO.requestExchange(exchange);
 
-        response.sendRedirect("objets.jsp");
+        response.sendRedirect("objects.jsp");
     }
 
     /*** 7. Accepter/Refuser un échange ***/
@@ -207,8 +199,8 @@ public class HelloServlet extends HttpServlet {
             return;
         }
 
-        List<Exchange> history = exchangeDAO.getUserExchangeHistory(utilisateur.getId());
-        request.setAttribute("history", history);
-        request.getRequestDispatcher("history.jsp").forward(request, response);
+       // List<Exchange> history = exchangeDAO.getUserExchangeHistory(utilisateur.getId());
+        //request.setAttribute("history", history);
+        //request.getRequestDispatcher("history.jsp").forward(request, response);
     }
 }

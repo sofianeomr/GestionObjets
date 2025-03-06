@@ -9,13 +9,14 @@ import javax.servlet.http.HttpSession;
 import org.gestionobjets.dao.UserDAO;
 import org.gestionobjets.dao.ObjectDAO;
 import org.gestionobjets.dao.ExchangeDAO;
+import org.gestionobjets.models.Categorie;
 import org.gestionobjets.models.Exchange;
 import org.gestionobjets.models.Utilisateur;
 import org.gestionobjets.models.Objet;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/user-servlet")
+@WebServlet("/UserServlet")
 public class UserServlet extends HttpServlet {
 
     private UserDAO userDAO;
@@ -132,7 +133,7 @@ public class UserServlet extends HttpServlet {
         String description = request.getParameter("description");
         //String proprietaire= request.getParameter("proprietaire");
 
-        Objet objet = new Objet(nom, categorie, description, Utilisateur.getId());
+        Objet objet = new Objet(nom,description, new Categorie(categorie), Utilisateur);
         objectDAO.addObject(objet);
 
         List<Objet> objets = objectDAO.getAllObjets();
@@ -184,7 +185,7 @@ public class UserServlet extends HttpServlet {
             return;
         }
 
-        Exchange exchange = new Exchange(utilisateur, objetPropose, objetDemande);
+        Exchange exchange = new Exchange( objetPropose, objetDemande,utilisateur);
         exchangeDAO.requestExchange(exchange);
 
         response.sendRedirect("jsp/objets.jsp");

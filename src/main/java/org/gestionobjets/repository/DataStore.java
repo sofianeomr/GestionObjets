@@ -42,7 +42,7 @@ public class DataStore {
         for (Objet o : objets) {
             if (o.getNom().toLowerCase().contains(query.toLowerCase()) ||
                     o.getDescription().toLowerCase().contains(query.toLowerCase()) ||
-                    o.getCategorie().toLowerCase().contains(query.toLowerCase())) {
+                    o.getCategorie().getNom().toLowerCase().contains(query.toLowerCase())) {
                 results.add(o);
             }
         }
