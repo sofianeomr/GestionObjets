@@ -10,17 +10,28 @@ public class ConnexionDatabase {
     private static final String PASSWORD = "fonsa";
     private static Connection connection = null;
 
-    static {
+    // Méthode pour obtenir une connexion valide
+    public static Connection getConnection() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // Charge le driver MySQL
-            connection = DriverManager.getConnection(URL_DATABASE, USER, PASSWORD);
+            if (connection == null || connection.isClosed()) {
+                Class.forName("com.mysql.cj.jdbc.Driver"); // Charger le driver
+                connection = DriverManager.getConnection(URL_DATABASE, USER, PASSWORD);
+            }
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Erreur de connexion à la base de données.");
         }
+        return connection;
     }
 
-    public static Connection getConnection() {
-        return connection;
+    // Méthode pour fermer la connexion proprement
+    public static void closeConnection() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
