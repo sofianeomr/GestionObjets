@@ -2,6 +2,7 @@ package org.gestionobjets.dao;
 
 import org.gestionobjets.models.Objet;
 import org.gestionobjets.models.Utilisateur;
+import org.gestionobjets.models.Categorie;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,12 +16,12 @@ public class ObjectDAO {
     }
 
     public boolean addObject(Objet objet) {
-        String query = "INSERT INTO objets (nom, categorie, description, proprietaireId) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO objets (nom, categorie, description, proprietaire_id) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, objet.getNom());
-            stmt.setString(2, objet.getCategorie());
+            stmt.setString(2, objet.getCategorie().getNom()); // Assurez-vous que la catégorie est récupérée correctement
             stmt.setString(3, objet.getDescription());
-            stmt.setInt(4, objet.getProprietaireId());
+            stmt.setInt(4, objet.getProprietaire().getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -28,39 +29,26 @@ public class ObjectDAO {
         }
     }
 
-    /*
     public List<Objet> getAllObjets() {
         List<Objet> objets = new ArrayList<>();
-        String query = "SELECT * FROM objets";
-        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+        String query = "SELECT o.*, c.nom AS categorieNom, u.id AS proprietaireId, u.nom AS proprietaireNom " +
+                "FROM objets o " +
+                "JOIN categories c ON o.categorie_id = c.id " +
+                "JOIN utilisateurs u ON o.proprietaire_id = u.id";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                objets.add(new Objet(rs.getInt("id"),
-                        rs.getString("nom"),
-                        rs.getString("description"),
-                        rs.getString("categorie"),
-                        rs.getInt("proprietaireId")));
+                Categorie categorie = new Categorie(rs.getString("categorieNom"));
+                Utilisateur proprietaire = new Utilisateur(rs.getInt("proprietaireId"), rs.getString("proprietaireNom"), "", "");
 
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return objets;
-    }
-    */
-
-
-    public List<Objet> getAllObjets() {
-        List<Objet> objets = new ArrayList<>();
-        try (Connection connection = ConnexionDatabase.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM objets")) {
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
                 objets.add(new Objet(
                         rs.getInt("id"),
                         rs.getString("nom"),
-                        rs.getString("categorie"),
                         rs.getString("description"),
-                        rs.getInt("proprietaire_id")
+                        categorie,
+                        proprietaire
                 ));
             }
         } catch (SQLException e) {
@@ -69,11 +57,13 @@ public class ObjectDAO {
         return objets;
     }
 
-
-
     public List<Objet> searchObjects(String keyword) {
         List<Objet> objets = new ArrayList<>();
-        String query = "SELECT * FROM objets WHERE nom LIKE ? OR categorie LIKE ?";
+        String query = "SELECT o.*, c.nom AS categorieNom, u.id AS proprietaireId, u.nom AS proprietaireNom " +
+                "FROM objets o " +
+                "JOIN categories c ON o.categorie_id = c.id " +
+                "JOIN utilisateurs u ON o.proprietaire_id = u.id " +
+                "WHERE o.nom LIKE ? OR c.nom LIKE ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, "%" + keyword + "%");
@@ -81,12 +71,15 @@ public class ObjectDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                Categorie categorie = new Categorie(rs.getString("categorieNom"));
+                Utilisateur proprietaire = new Utilisateur(rs.getInt("proprietaireId"), rs.getString("proprietaireNom"), "", "");
+
                 objets.add(new Objet(
                         rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("description"),
-                        rs.getString("categorie"),
-                        new Utilisateur(rs.getInt("proprietaireId"), "", "", "")
+                        categorie,
+                        proprietaire
                 ));
             }
         } catch (SQLException e) {
@@ -97,23 +90,28 @@ public class ObjectDAO {
 
     public Objet getObjectById(int id) {
         Objet objet = null;
-        String sql = "SELECT * FROM objets WHERE id = ?";
+        String sql = "SELECT o.*, c.nom AS categorieNom, u.id AS proprietaireId, u.nom AS proprietaireNom " +
+                "FROM objets o " +
+                "JOIN categories c ON o.categorie_id = c.id " +
+                "JOIN utilisateurs u ON o.proprietaire_id = u.id " +
+                "WHERE o.id = ?";
 
-        try (Connection conn = ConnexionDatabase.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                objet = new Objet(rs.getInt("id"),
+                Categorie categorie = new Categorie(rs.getString("categorieNom"));
+                Utilisateur proprietaire = new Utilisateur(rs.getInt("proprietaireId"), rs.getString("proprietaireNom"), "", "");
+
+                objet = new Objet(
+                        rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("description"),
-                        rs.getString("categorie"),
-                        rs.getInt("proprietaire_id"));
-
+                        categorie,
+                        proprietaire
+                );
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -123,31 +121,32 @@ public class ObjectDAO {
 
     public Objet getObjectByOwnerId(int ownerId) {
         Objet objet = null;
-        String sql = "SELECT * FROM objets WHERE proprietaire_id = ? LIMIT 1"; // Récupère un seul objet
+        String sql = "SELECT o.*, c.nom AS categorieNom, u.id AS proprietaireId, u.nom AS proprietaireNom " +
+                "FROM objets o " +
+                "JOIN categories c ON o.categorie_id = c.id " +
+                "JOIN utilisateurs u ON o.proprietaire_id = u.id " +
+                "WHERE o.proprietaire_id = ? LIMIT 1";
 
-        try (Connection conn = ConnexionDatabase.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, ownerId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
+                Categorie categorie = new Categorie(rs.getString("categorieNom"));
+                Utilisateur proprietaire = new Utilisateur(rs.getInt("proprietaireId"), rs.getString("proprietaireNom"), "", "");
+
                 objet = new Objet(
                         rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("description"),
-                        rs.getString("categorie"),
-                        rs.getInt("proprietaire_id")
+                        categorie,
+                        proprietaire
                 );
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return objet;
     }
-
-
 }

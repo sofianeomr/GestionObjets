@@ -5,9 +5,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnexionDatabase {
-    private static final String URL_DATABASE = "jdbc:mysql://localhost:3306/objectsxchange";
+    private static final String URL_DATABASE = "jdbc:mysql://localhost:3307/objectsxchange";
     private static final String USER = "root";
-    private static final String PASSWORD = "fonsa";
+    private static final String PASSWORD = "";
     private static Connection connection = null;
 
     static {

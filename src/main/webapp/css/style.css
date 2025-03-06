@@ -1,65 +1,187 @@
-/* style.css */
-
+/* CSS pour la page d'accueil */
 body {
     font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    height: 100vh;
+    text-align: center;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo h1 {
+    font-size: 36px;
+    color: #2c3e50;
+    margin-bottom: 40px;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.btn {
+    font-size: 18px;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.visitor {
+    background-color: #3498db;
+}
+
+.visitor:hover {
+    background-color: #2980b9;
+}
+
+.member {
+    background-color: #2ecc71;
+}
+
+.member:hover {
+    background-color: #27ae60;
+}
+/* Reset de base */
+* {
     margin: 0;
     padding: 0;
-    background-color: #fafafa;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-h2 {
-    color: #333;
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c3e50;
+    padding: 15px 30px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-p {
-    color: #555;
+.navbar .logo a {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s;
 }
 
-/* Un conteneur central pour le formulaire de login, par exemple */
+.navbar .logo a:hover {
+    color: #1abc9c;
+}
+
+.navbar nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar nav ul li {
+    display: inline;
+}
+
+.navbar nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar nav ul li a:hover,
+.navbar nav ul li a.active {
+    background-color: #1abc9c;
+    color: #2c3e50;
+}
+
+/* Formulaire */
 .form-container {
     max-width: 400px;
-    margin: 60px auto; /* Centrage horizontal */
+    margin: 80px auto;
     padding: 20px;
-    background: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
 }
 
 .form-container h2 {
     margin-bottom: 20px;
+    color: #2c3e50;
 }
 
 .form-container label {
     display: block;
-    margin-bottom: 6px;
+    text-align: left;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-container input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+.form-container input:focus {
+    border-color: #1abc9c;
+}
+
+.form-container button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-container button:hover {
+    background-color: #2980b9;
+}
+
+/* Message d'erreur */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.form-container p {
+    margin-top: 10px;
+}
+
+.form-container p a {
+    color: #3498db;
+    text-decoration: none;
     font-weight: bold;
 }
 
-.form-container input[type="text"],
-.form-container input[type="password"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-container button[type="submit"] {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.form-container button[type="submit"]:hover {
-    background-color: #0056b3;
-}
-
-.error-message {
-    color: red;
-    margin-bottom: 10px;
+.form-container p a:hover {
+    text-decoration: underline;
 }
