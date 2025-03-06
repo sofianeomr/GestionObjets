@@ -1,11 +1,11 @@
 package org.gestionobjets;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.gestionobjets.dao.UserDAO;
 import org.gestionobjets.dao.ObjectDAO;
 import org.gestionobjets.dao.ExchangeDAO;
@@ -25,6 +25,7 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+        // Ensure these are initialized safely
         userDAO = new UserDAO();
         objectDAO = new ObjectDAO();
         exchangeDAO = new ExchangeDAO();
@@ -76,26 +77,24 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    /*** 1. Création de compte ***/
     private void registerUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String nom = request.getParameter("nom");
         String email = request.getParameter("email");
         String motDePasse = request.getParameter("password");
-        //String motDePasse = request.getParameter("motDePasse");
 
         Utilisateur utilisateur = new Utilisateur(nom, email, motDePasse);
         boolean success = userDAO.registerUser(utilisateur);
 
         if (success) {
-            response.sendRedirect("login.jsp");
+            request.setAttribute("successMessage", "Inscription réussie. Veuillez vous connecter.");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         } else {
             request.setAttribute("errorMessage", "Erreur lors de l'inscription.");
             request.getRequestDispatcher("registration.jsp").forward(request, response);
         }
     }
 
-    /*** 2. Connexion utilisateur ***/
     private void loginUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String email = request.getParameter("email");
@@ -109,21 +108,18 @@ public class UserServlet extends HttpServlet {
             List<Objet> objets = objectDAO.getAllObjets();
             request.setAttribute("objects", objets);
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-
-            response.sendRedirect("dashboard.jsp");
         } else {
             request.setAttribute("errorMessage", "Email ou mot de passe incorrect.");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
 
-    /*** 3. Création d'un objet ***/
     private void createObject(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Utilisateur Utilisateur = (Utilisateur) session.getAttribute("utilisateur");
+        Utilisateur utilisateur = (Utilisateur) session.getAttribute("utilisateur");
 
-        if (Utilisateur == null) {
+        if (utilisateur == null) {
             response.sendRedirect("login.jsp");
             return;
         }
@@ -131,19 +127,14 @@ public class UserServlet extends HttpServlet {
         String nom = request.getParameter("nom");
         String categorie = request.getParameter("categorie");
         String description = request.getParameter("description");
-        //String proprietaire= request.getParameter("proprietaire");
 
-        Objet objet = new Objet(nom, categorie, description, Utilisateur.getId());
+        Objet objet = new Objet(nom, categorie, description, utilisateur.getId());
         objectDAO.addObject(objet);
 
         List<Objet> objets = objectDAO.getAllObjets();
         request.setAttribute("objects", objets);
         request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-
-
-        response.sendRedirect("dashboard.jsp");
     }
-
     /*** 4. Liste des objets ***/
     private void listObjects(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
