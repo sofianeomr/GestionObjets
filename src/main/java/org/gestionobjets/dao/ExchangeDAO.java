@@ -17,20 +17,6 @@ public class ExchangeDAO {
         this.connection = ConnexionDatabase.getConnection();
     }
 
-    /*
-    public boolean requestExchange(Exchange exchange) {
-        String query = "INSERT INTO echanges (demandeurId, proprietaireId, objetId, statut) VALUES (?, ?, ?, 'pending')";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, exchange.getDemandeurId());
-            stmt.setInt(2, exchange.getProprietaireId());
-            stmt.setInt(3, exchange.getObjetId());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    */
 
     public void requestExchange(Exchange exchange) {
         String sql = "INSERT INTO exchanges (objet_propose_id, objet_demande_id, demandeur_id, statut) VALUES (?, ?, ?, 'EN_ATTENTE')";
@@ -44,6 +30,7 @@ public class ExchangeDAO {
             e.printStackTrace();
         }
     }
+
 
 
     public boolean updateExchangeStatus(int exchangeId, String status) {

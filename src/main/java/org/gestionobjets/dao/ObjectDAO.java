@@ -14,9 +14,19 @@ public class ObjectDAO {
         this.connection = ConnexionDatabase.getConnection();
     }
 
+
+
     public boolean addObject(Objet objet) {
+        if (objet.getNom() == null || objet.getNom().trim().isEmpty() ||
+                objet.getCategorie() == null || objet.getCategorie().trim().isEmpty() ||
+                objet.getDescription() == null || objet.getDescription().trim().isEmpty()) {
+            System.out.println("Erreur : Impossible d'ajouter un objet avec des champs vides !");
+            return false;
+        }
+
         String query = "INSERT INTO objets (nom, categorie, description, proprietaireId) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection conn = ConnexionDatabase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, objet.getNom());
             stmt.setString(2, objet.getCategorie());
             stmt.setString(3, objet.getDescription());
@@ -28,46 +38,45 @@ public class ObjectDAO {
         }
     }
 
-    /*
-    public List<Objet> getAllObjets() {
+
+    // Récupérer les objets de l'utilisateur
+    public List<Objet> getUserObjects(int userId) {
         List<Objet> objets = new ArrayList<>();
-        String query = "SELECT * FROM objets";
-        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+        String query = "SELECT * FROM objets WHERE proprietaireId = ?";
+        try (Connection conn = ConnexionDatabase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                objets.add(new Objet(rs.getInt("id"),
-                        rs.getString("nom"),
-                        rs.getString("description"),
-                        rs.getString("categorie"),
+                objets.add(new Objet(rs.getInt("id"), rs.getString("nom"),
+                        rs.getString("categorie"), rs.getString("description"),
                         rs.getInt("proprietaireId")));
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return objets;
     }
-    */
 
-
-    public List<Objet> getAllObjets() {
+    // Récupérer les objets des autres utilisateurs
+    public List<Objet> getOtherUsersObjects(int userId) {
         List<Objet> objets = new ArrayList<>();
-        try (Connection connection = ConnexionDatabase.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM objets")) {
-            ResultSet rs = statement.executeQuery();
+        String query = "SELECT * FROM objets WHERE proprietaireId <> ?";
+        try (Connection conn = ConnexionDatabase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                objets.add(new Objet(
-                        rs.getInt("id"),
-                        rs.getString("nom"),
-                        rs.getString("categorie"),
-                        rs.getString("description"),
-                        rs.getInt("proprietaire_id")
-                ));
+                objets.add(new Objet(rs.getInt("id"), rs.getString("nom"),
+                        rs.getString("categorie"), rs.getString("description"),
+                        rs.getInt("proprietaireId")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return objets;
     }
+
 
 
 
@@ -110,7 +119,8 @@ public class ObjectDAO {
                         rs.getString("nom"),
                         rs.getString("description"),
                         rs.getString("categorie"),
-                        rs.getInt("proprietaire_id"));
+                       // rs.getInt("proprietaire_id"));
+                        rs.getInt("proprietaireId"));
 
             }
 
@@ -137,8 +147,9 @@ public class ObjectDAO {
                         rs.getString("nom"),
                         rs.getString("description"),
                         rs.getString("categorie"),
-                        rs.getInt("proprietaire_id")
-                );
+                        //rs.getInt("proprietaire_id")
+                        rs.getInt("proprietaireId"));
+
 
             }
 
