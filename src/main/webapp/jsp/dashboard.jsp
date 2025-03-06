@@ -38,7 +38,7 @@
 </ul>
 
 <h2>Ajouter un objet</h2>
-<form action="HelloServlet?action=create-object" method="post">
+<form action="<%= request.getContextPath() %>/user-servlet?action=create-object" method="post">
     <label>Nom :</label>
     <input type="text" name="nom" required />
 

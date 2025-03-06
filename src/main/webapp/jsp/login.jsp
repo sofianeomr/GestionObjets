@@ -20,7 +20,7 @@
     %>
 
     <h2>Login</h2>
-    <form action="HelloServlet?action=login" method="post">
+    <form action="<%= request.getContextPath() %>/user-servlet?action=login" method="post">
         <label>Email :</label>
         <input type="email" name="email" required />
 

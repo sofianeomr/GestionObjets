@@ -3,9 +3,9 @@ package org.gestionobjets;
 import java.io.*;
 import java.util.List;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
 import org.gestionobjets.dao.ExchangeDAO;
 import org.gestionobjets.dao.ObjectDAO;
 import org.gestionobjets.dao.UserDAO;
