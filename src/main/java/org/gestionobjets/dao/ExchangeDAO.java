@@ -1,16 +1,21 @@
 package org.gestionobjets.dao;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.gestionobjets.models.Categorie;
 import org.gestionobjets.models.Exchange;
 import org.gestionobjets.models.Objet;
 import org.gestionobjets.models.Utilisateur;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class ExchangeDAO {
 
@@ -40,14 +45,17 @@ public class ExchangeDAO {
     */
 
     public void requestExchange(Exchange exchange) {
-        String sql = "INSERT INTO exchanges (objet_propose_id, objet_demande_id, demandeur_id, statut) VALUES (?, ?, ?, 'EN_ATTENTE')";
+        String sql = "INSERT INTO exchanges (objet_propose_id, objet_demande_id, demandeur_id, statut, dateEchange) VALUES (?, ?, ?, 'EN_ATTENTE', NOW())";
         try (Connection connection = ConnexionDatabase.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, exchange.getObjetPropose().getId());
             statement.setInt(2, exchange.getObjetDemande().getId());
             statement.setInt(3, exchange.getDemandeur().getId());
+
+            // Exécution de la requête
             statement.executeUpdate();
         } catch (SQLException e) {
+            System.out.println("Erreur lors de l'insertion de la demande d'échange : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -122,5 +130,45 @@ public class ExchangeDAO {
         }
         return history;
     }
+
+    public List<Exchange> getSentRequestsByUserId(int userId) {
+        List<Exchange> exchanges = new ArrayList<>();
+        String sql = "SELECT * FROM exchanges WHERE demandeur_id = ?";
+        try (Connection connection = ConnexionDatabase.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                // Récupération des informations sur l'échange
+                int objetDemandeId = resultSet.getInt("objet_demande_id");
+                int objetProposeId = resultSet.getInt("objet_propose_id");
+                String statut = resultSet.getString("statut");
+
+                // Créer des objets pour l'échange
+                ObjectDAO objectDAO = new ObjectDAO();
+                Objet objetDemande = objectDAO.getObjectById(objetDemandeId);
+                Objet objetPropose = objectDAO.getObjectById(objetProposeId);
+
+                // Utilisateur (ID de l'utilisateur demandé)
+                // Remplacer le fait de récupérer l'utilisateur entier par son ID, si nécessaire
+                Utilisateur utilisateur = new Utilisateur(userId, "", "", ""); // Pas besoin de récupérer les données utilisateur ici
+
+                // Créer l'objet Exchange
+                Exchange exchange = new Exchange(objetPropose, objetDemande, utilisateur);
+                exchange.setStatut(Exchange.Statut.valueOf(statut)); // Définit le statut de l'échange
+
+                // Ajouter l'échange à la liste
+                exchanges.add(exchange);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exchanges;
+    }
+
+
 
 }

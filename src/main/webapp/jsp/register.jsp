@@ -33,18 +33,20 @@
   <% } %>
 
   <h2>Créer un compte</h2>
-  <form action="<%=request.getContextPath()%>/jsp/register" method="post">
+  <form action="<%= request.getContextPath() %>/UserServlet?action=register" method="post">
+    <input type="hidden" name="action" value="register" />
+
     <label>Nom :</label>
-    <input type="text" name="name" required />
+    <input type="text" name="nom" required />
 
     <label>Email :</label>
     <input type="email" name="email" required />
 
     <label>Mot de passe :</label>
-    <input type="password" name="password" required />
+    <input type="password" name="motDePasse" required />
 
     <label>Confirmer le mot de passe :</label>
-    <input type="password" name="confirm-password" required />
+    <input type="password" name="confirmMotDePasse" required />
 
     <button type="submit">S'inscrire</button>
     <p>Déjà un compte ? <a href="<%=request.getContextPath()%>/jsp/login.jsp">Se connecter</a></p>

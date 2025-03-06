@@ -17,7 +17,7 @@
     <% } %>
 
     <h2>Connexion</h2>
-    <form action="<%= request.getContextPath() %>/user-servlet?action=login" method="post">
+    <form action="<%= request.getContextPath() %>/UserServlet?action=login" method="post">
         <label>Email :</label>
         <input type="email" name="email" required />
 

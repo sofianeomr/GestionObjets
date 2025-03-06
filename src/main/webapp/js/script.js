@@ -8,16 +8,18 @@ function closeCreateObjectModal() {
     document.getElementById("createObjectModal").style.display = "none";
 }
 
-// Ouvrir la pop-up pour demander un échange
-function openExchangeModal(objectName) {
-    document.getElementById("selectedObject").textContent = objectName;
+
+
+function openExchangeModal(objetNom, objetId) {
+    document.getElementById("selectedObject").textContent = objetNom;
+    document.getElementById("objetDemandeId").value = objetId;
     document.getElementById("exchangeModal").style.display = "block";
 }
 
-// Fermer la pop-up de demande d'échange
 function closeExchangeModal() {
     document.getElementById("exchangeModal").style.display = "none";
 }
+
 
 // Fermer la pop-up si on clique à l'extérieur
 window.onclick = function(event) {
@@ -32,3 +34,5 @@ window.onclick = function(event) {
         exchangeModal.style.display = "none";
     }
 };
+
+

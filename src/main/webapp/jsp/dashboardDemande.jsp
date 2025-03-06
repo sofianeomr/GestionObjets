@@ -72,15 +72,18 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>Ordinateur portable</td>
-                <td>Marie Curie</td>
-                <td>Vélo de route</td>
-                <td>En attente</td>
-                <td>
-                    <button class="cancel">🗑 Annuler</button>
-                </td>
-            </tr>
+            <!-- Boucle JSP pour afficher les demandes envoyées -->
+            <c:forEach var="exchange" items="${sentRequests}">
+                <tr>
+                    <td>${exchange.objetDemande.nom}</td>
+                    <td>${exchange.objetPropose.proprietaire.nom}</td>
+                    <td>${exchange.objetPropose.nom}</td>
+                    <td>${exchange.statut}</td>
+                    <td>
+                        <button class="cancel">🗑 Annuler</button>
+                    </td>
+                </tr>
+            </c:forEach>
             </tbody>
         </table>
     </section>

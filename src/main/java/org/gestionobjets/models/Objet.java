@@ -25,6 +25,13 @@ public class Objet {
 
     // Constructeur par défaut
     public Objet() {}
+    public Objet(int id, String nom, String description) {
+        this.id = id;
+        this.nom = nom;
+        this.description = description;
+        this.categorie = null;  // ou une valeur par défaut si nécessaire
+        this.proprietaire = null;  // ou une valeur par défaut si nécessaire
+    }
 
     // Constructeur avec nom, description, catégorie et propriétaire
     public Objet(String nom, String description, Categorie categorie, Utilisateur proprietaire) {

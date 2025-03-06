@@ -16,9 +16,14 @@ public class Categorie {
     // Constructeur par défaut
     public Categorie() {}
 
-    // Constructeur avec paramètres
+    // Constructeur avec nom
     public Categorie(String nom) {
         this.nom = nom;
+    }
+
+    // Constructeur avec ID
+    public Categorie(int id) {
+        this.id = id;
     }
 
     // Getters et Setters

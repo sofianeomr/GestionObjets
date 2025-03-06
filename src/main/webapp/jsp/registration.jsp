@@ -16,7 +16,7 @@
 <body>
 <div class="container">
     <h2>Créer un compte</h2>
-    <form action="<%= request.getContextPath() %>/user-servlet?action=register" method="post">
+    <form action="<%= request.getContextPath() %>/UserServlet?action=register" method="post">
         <label>Nom :</label>
         <input type="text" name="nom" required />
 
