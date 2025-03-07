@@ -14,6 +14,7 @@ import org.gestionobjets.models.Exchange;
 import org.gestionobjets.models.Utilisateur;
 import org.gestionobjets.models.Objet;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/UserServlet")
@@ -60,8 +61,6 @@ public class UserServlet extends HttpServlet {
             throws ServletException, IOException {
         // Récupérer l'action de la requête
         String action = request.getParameter("action");
-        showSentRequests(request, response);
-
         switch (action) {
             case "list-objects":
                 listObjects(request, response);
@@ -80,28 +79,60 @@ public class UserServlet extends HttpServlet {
                 break;
         }
     }
-    // Méthode pour afficher les demandes envoyées
+
     private void showSentRequests(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Récupérer l'ID de l'utilisateur connecté depuis la session
-        Integer userId = (Integer) request.getSession().getAttribute("userId");
+        // Initialisation de la session
+        HttpSession session = request.getSession(true); // true crée une nouvelle session si elle n'existe pas encore
 
-        if (userId != null) {
-            // Récupérer les demandes envoyées par l'utilisateur
-            ExchangeDAO exchangeDAO = new ExchangeDAO();
-            List<Exchange> sentRequests = exchangeDAO.getSentRequestsByUserId(userId);
+        // Récupérer l'ID utilisateur de la session
+        Integer userId = (Integer) session.getAttribute("userId");
 
-            // Ajouter les demandes envoyées à la requête
-            request.setAttribute("sentRequests", sentRequests);
-
-            // Rediriger vers la page de dashboard pour afficher les demandes envoyées
-            request.getRequestDispatcher("/jsp/dashboard.jsp").forward(request, response);
-        } else {
-            // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
+        // Vérification si l'utilisateur est connecté
+        if (userId == null) {
+            System.out.println("❌ [ERROR] Utilisateur non connecté - Redirection vers login.jsp");
+            // Redirection vers la page de login si l'utilisateur n'est pas connecté
             response.sendRedirect("login.jsp");
+            return;
         }
-    }
 
+        System.out.println("🔍 [DEBUG] Utilisateur ID récupéré : " + userId);
+
+        // Création d'une instance de ExchangeDAO pour récupérer les échanges envoyés
+        ExchangeDAO exchangeDAO = new ExchangeDAO();
+
+        // Récupération des demandes envoyées depuis la base de données
+        List<Exchange> sentRequests = exchangeDAO.getSentRequestsByUserId(userId);
+
+        // Si aucune demande envoyée n'est trouvée
+        if (sentRequests == null || sentRequests.isEmpty()) {
+            System.out.println("❌ [ERROR] Aucune demande envoyée trouvée pour l'utilisateur ID: " + userId);
+
+            // Si aucune demande n'est trouvée, nous utilisons une liste vide
+            sentRequests = new ArrayList<>();
+        } else {
+            System.out.println("✅ [SUCCESS] Nombre de demandes envoyées trouvées : " + sentRequests.size());
+
+            // Affichage de toutes les demandes envoyées pour le debug
+            for (Exchange exchange : sentRequests) {
+                System.out.println("📦 [DEBUG] Demande envoyée : " + exchange);
+            }
+        }
+
+        // Vérification que les demandes envoyées sont stockées correctement dans la session
+        if (sentRequests != null) {
+            System.out.println("✅ [DEBUG] Stockage des demandes envoyées dans la session");
+        } else {
+            System.out.println("❌ [ERROR] Erreur lors du stockage des demandes dans la session");
+        }
+
+        // Stockage des données dans la session pour éviter la perte après un rafraîchissement
+        session.setAttribute("sentRequests", sentRequests);
+
+
+        // Redirection vers la page JSP pour afficher les demandes envoyées
+        request.getRequestDispatcher("/jsp/dashboardDemande.jsp").forward(request, response);
+    }
 
     /*** 1. Création de compte ***/
     private void registerUser(HttpServletRequest request, HttpServletResponse response)
@@ -282,9 +313,6 @@ public class UserServlet extends HttpServlet {
             return;
         }
 
-        List<Exchange> history = exchangeDAO.getUserExchangeHistory(utilisateur.getId());
-        request.setAttribute("history", history);
-        request.getRequestDispatcher("jsp/history.jsp").forward(request, response);
     }
 
     private void showExchangePage(HttpServletRequest request, HttpServletResponse response)
@@ -303,6 +331,48 @@ public class UserServlet extends HttpServlet {
         request.setAttribute("mesObjets", objetsUtilisateur);
         request.setAttribute("objetsDisponibles", objetsDisponibles);
         request.getRequestDispatcher("jsp/objets.jsp").forward(request, response);
+    }
+
+    private void showReceivedRequests(HttpServletRequest request, HttpServletResponse response)
+
+            throws ServletException, IOException {
+        System.out.println("Here");
+
+        // Initialisation de la session
+        HttpSession session = request.getSession(true);
+
+        // Récupérer l'ID utilisateur de la session
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        // Vérification si l'utilisateur est connecté
+        if (userId == null) {
+            System.out.println("❌ [ERROR] Utilisateur non connecté - Redirection vers login.jsp");
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        System.out.println("🔍 [DEBUG] Utilisateur ID récupéré : " + userId);
+
+        // Création d'une instance de ExchangeDAO pour récupérer les échanges reçus
+        ExchangeDAO exchangeDAO = new ExchangeDAO();
+
+        // Récupération des demandes reçues depuis la base de données
+        List<Exchange> receivedRequests = exchangeDAO.getReceivedRequestsByUserId(userId);
+        System.out.println("receivedRequests " + receivedRequests);
+
+        // Si aucune demande reçue n'est trouvée
+        if (receivedRequests == null || receivedRequests.isEmpty()) {
+            System.out.println("❌ [ERROR] Aucune demande reçue trouvée pour l'utilisateur ID: " + userId);
+            receivedRequests = new ArrayList<>();
+        } else {
+            System.out.println("✅ [SUCCESS] Nombre de demandes reçues trouvées : " + receivedRequests.size());
+        }
+
+        // Stockage des données dans la session
+        session.setAttribute("receivedRequests", receivedRequests);
+
+        // Redirection vers la page JSP pour afficher les demandes reçues
+        request.getRequestDispatcher("/jsp/dashboardDemande.jsp").forward(request, response);
     }
 
 }

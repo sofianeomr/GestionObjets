@@ -35,14 +35,13 @@
             <ul>
                 <% if (userId != -1) { %>
                 <li><a href="<%=request.getContextPath()%>/jsp/objets.jsp">Objets</a></li>
-                <li><a href="<%=request.getContextPath()%>/jsp/dashboardDemande.jsp">Échanges</a></li>
+                <li><a href="<%=request.getContextPath()%>/UserServlet?action=sent-requests">Échanges</a></li>
                 <li><a href="<%=request.getContextPath()%>/logout">Déconnexion</a></li>
                 <% } %>
                 <% if (userId == -1) { %>
                 <li><a href="<%=request.getContextPath()%>/jsp/registration.jsp">Inscription</a></li>
                 <li><a href="<%=request.getContextPath()%>/jsp/login.jsp">Connexion</a></li>
                 <% } %>
-
             </ul>
         </nav>
     </div>
