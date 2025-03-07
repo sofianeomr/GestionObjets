@@ -48,7 +48,7 @@
     <label>Confirmer le mot de passe :</label>
     <input type="password" name="confirmMotDePasse" required />
 
-    <button type="submit">S'inscrire</button>
+    <button type="submit" id="inscription-button">S'inscrire</button>
     <p>Déjà un compte ? <a href="<%=request.getContextPath()%>/jsp/login.jsp">Se connecter</a></p>
   </form>
 </div>

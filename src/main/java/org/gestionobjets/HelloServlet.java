@@ -13,7 +13,6 @@ import org.gestionobjets.models.Exchange;
 import org.gestionobjets.models.Objet;
 import org.gestionobjets.models.Utilisateur;
 
-@WebServlet("/HelloServlet")
 public class HelloServlet extends HttpServlet {
     private UserDAO userDAO;
     private ObjectDAO objectDAO;

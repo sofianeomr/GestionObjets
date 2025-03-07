@@ -13,7 +13,7 @@ public class Utilisateur {
     @Column(nullable = false)
     private String nom;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -28,6 +28,8 @@ public class Utilisateur {
         this.email = email;
         this.motDePasse = motDePasse;
     }
+
+
 
     // Constructeur avec id, nom, email et mot de passe
     public Utilisateur(int id, String nom, String email, String motDePasse) {

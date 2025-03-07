@@ -10,7 +10,7 @@ public class Categorie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String nom;
 
     // Constructeur par défaut

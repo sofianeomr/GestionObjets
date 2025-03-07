@@ -26,7 +26,7 @@
         <label>Mot de passe :</label>
         <input type="password" name="motDePasse" required />
 
-        <input type="submit" value="S'inscrire" />
+        <Button type="submit" >S'inscrire</Button>
     </form>
     <p>Déjà un compte ? <a href="login.jsp">Connectez-vous</a></p>
 </div>
