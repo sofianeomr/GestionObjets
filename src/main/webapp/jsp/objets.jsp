@@ -86,7 +86,7 @@
             <label for="objectCategory">Catégorie :</label>
             <select id="objectCategory" name="categorie_id" required>
                 <option value="">Sélectionner une catégorie...</option>
-                <option value="3">Électronique</option>
+                <option value="3">Electronique</option>
                 <option value="4">Sport</option>
                 <option value="5">Livre</option>
                 <option value="6">Cuisine</option>
