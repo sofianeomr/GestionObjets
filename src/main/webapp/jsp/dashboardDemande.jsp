@@ -18,8 +18,7 @@
         <nav>
             <ul>
                 <li><a href="<%=request.getContextPath()%>/jsp/objets.jsp">Objets</a></li>
-                <li><a href="<%=request.getContextPath()%>/jsp/addObjet.jsp">Ajouter un objet</a></li>
-                <li><a href="<%=request.getContextPath()%>/jsp/dashboard.jsp">Dashboard</a></li>
+                <li><a href="<%=request.getContextPath()%>/jsp/dashboardDemande.jsp">Échanges</a></li>
                 <li><a href="<%=request.getContextPath()%>/logout">Déconnexion</a></li>
             </ul>
         </nav>

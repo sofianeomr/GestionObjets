@@ -18,11 +18,8 @@
         userId = -1;
     }
 
-    // Récupérer les objets de l'utilisateur
     ObjectDAO objectDAO = new ObjectDAO();
-    List<Objet> userObjects = objectDAO.getObjectsByOwnerId(userId);
-
-    // Récupérer tous les objets disponibles à l'échange, excepté ceux de l'utilisateur
+    List<Objet> userObjects = (userId != -1) ? objectDAO.getObjectsByOwnerId(userId) : null;
     List<Objet> availableObjects = objectDAO.getAllObjetsExceptOwner(userId);
 %>
 
@@ -36,10 +33,16 @@
         </div>
         <nav>
             <ul>
+                <% if (userId != -1) { %>
                 <li><a href="<%=request.getContextPath()%>/jsp/objets.jsp">Objets</a></li>
                 <li><a href="<%=request.getContextPath()%>/jsp/dashboardDemande.jsp">Échanges</a></li>
+                <li><a href="<%=request.getContextPath()%>/logout">Déconnexion</a></li>
+                <% } %>
+                <% if (userId == -1) { %>
                 <li><a href="<%=request.getContextPath()%>/jsp/registration.jsp">Inscription</a></li>
                 <li><a href="<%=request.getContextPath()%>/jsp/login.jsp">Connexion</a></li>
+                <% } %>
+
             </ul>
         </nav>
     </div>
@@ -47,7 +50,9 @@
 
 <!-- Contenu principal -->
 <div class="container">
+    <% if (userId != -1) { %>
     <button class="create-object-btn" onclick="openCreateObjectModal()">Créer un objet</button>
+    <% } %>
 
     <h2>Objets Disponibles</h2>
     <div class="objects-list">
@@ -56,15 +61,18 @@
             <img src="<%=request.getContextPath()%>/images/<%= objet.getNom().toLowerCase() %>.jpg" alt="<%= objet.getNom() %>">
             <h3><%= objet.getNom() %></h3>
             <p>État : <%= objet.getDescription() %></p>
+            <% if (userId != -1) { %>
             <button onclick="openExchangeModal('<%= objet.getNom() %>', <%= objet.getId() %>)">Demander un échange</button>
+            <% } %>
         </div>
         <% } %>
     </div>
 </div>
 
 <!-- MODALE POUR CRÉATION D'OBJET -->
-<div id="createObjectModal" class="modal" style="display: none;">
-    <div class="modal-content">
+<% if (userId != -1) { %>
+<div id="createObjectModal" class="modal">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <span class="close" onclick="closeCreateObjectModal()">&times;</span>
         <h2>Créer un nouvel objet</h2>
 
@@ -78,18 +86,23 @@
             <label for="objectCategory">Catégorie :</label>
             <select id="objectCategory" name="categorie_id" required>
                 <option value="">Sélectionner une catégorie...</option>
-                <option value="1">Électronique</option>
-                <option value="2">Sport</option>
-                <option value="3">Maison</option>
+                <option value="3">Électronique</option>
+                <option value="4">Sport</option>
+                <option value="5">Livre</option>
+                <option value="6">Cuisine</option>
+                <option value="7">Automobile</option>
             </select>
 
             <button type="submit">Créer l'objet</button>
         </form>
     </div>
 </div>
+<% } %>
+
 <!-- MODALE POUR DEMANDE D'ÉCHANGE -->
-<div id="exchangeModal" class="modal" style="display: none;">
-    <div class="modal-content">
+<% if (userId != -1) { %>
+<div id="exchangeModal" class="modal">
+    <div class="modal-content" onclick="event.stopPropagation()">
         <span class="close" onclick="closeExchangeModal()">&times;</span>
         <h2>Demande d'échange</h2>
         <p>Vous souhaitez échanger contre : <strong id="selectedObject"></strong></p>
@@ -110,40 +123,47 @@
         </form>
     </div>
 </div>
+<% } %>
 
 <!-- Script JavaScript -->
 <script>
+    function openCreateObjectModal() {
+        document.getElementById("createObjectModal").style.display = "flex";
+    }
+
+    function closeCreateObjectModal() {
+        document.getElementById("createObjectModal").style.display = "none";
+    }
+
     function openExchangeModal(objectName, objectId) {
-        // Ouvrir la modal pour demander un échange
-        document.getElementById('exchangeModal').style.display = 'block';
-
-        // Afficher le nom de l'objet sélectionné dans la modal
+        document.getElementById('exchangeModal').style.display = 'flex';
         document.getElementById('selectedObject').innerText = objectName;
-
-        // Ajouter l'ID de l'objet sélectionné dans un champ caché du formulaire
         document.getElementById('objectId').value = objectId;
     }
 
     function closeExchangeModal() {
-        // Fermer la modal pour la demande d'échange
         document.getElementById('exchangeModal').style.display = 'none';
     }
 
-    // Fonction pour mettre à jour le champ caché avec l'ID de l'objet sélectionné
     function updateSelectedObjectId() {
         var selectedObjectId = document.getElementById('myObjects').value;
         document.getElementById('selectedObjectId').value = selectedObjectId;
     }
 
-    // Lorsque l'utilisateur clique à l'extérieur de la modal, fermer la modal
+    // Fermer la pop-up si on clique à l'extérieur
     window.onclick = function(event) {
-        var modal = document.getElementById('exchangeModal');
-        if (event.target == modal) {
-            closeExchangeModal();
-        }
-    }
-</script>
+        let createObjectModal = document.getElementById("createObjectModal");
+        let exchangeModal = document.getElementById("exchangeModal");
 
+        if (event.target === createObjectModal) {
+            createObjectModal.style.display = "none";
+        }
+
+        if (event.target === exchangeModal) {
+            exchangeModal.style.display = "none";
+        }
+    };
+</script>
 
 </body>
 </html>

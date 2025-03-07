@@ -5,91 +5,81 @@ import org.gestionobjets.models.Categorie;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class CategorieDAOTest {
 
     private CategorieDAO categorieDAO;
-    private Connection mockConnection;
-    private PreparedStatement mockPreparedStatement;
-    private ResultSet mockResultSet;
 
     @Before
-    public void setUp() throws SQLException {
-        mockConnection = mock(Connection.class);
-        mockPreparedStatement = mock(PreparedStatement.class);
-        mockResultSet = mock(ResultSet.class);
-
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-
-        categorieDAO = new CategorieDAO() {
-            protected Connection getConnection() {
-                return mockConnection;
-            }
-        };
+    public void setUp() {
+        categorieDAO = new CategorieDAO();
+        // Assurez-vous que la base de données de test est configurée et vide avant chaque test
     }
 
     @Test
-    public void testAddCategorie() throws SQLException {
+    public void testAddCategorie() {
         Categorie categorie = new Categorie("Nouvelle Catégorie");
-
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
         boolean result = categorieDAO.addCategorie(categorie);
         assertTrue(result);
 
-        verify(mockPreparedStatement).setString(1, "Nouvelle Catégorie");
-        verify(mockPreparedStatement).executeUpdate();
+        // Vérifiez que la catégorie a été ajoutée à la base de données
+        Categorie addedCategorie = categorieDAO.getCategorieById(categorie.getId());
+        assertNotNull(addedCategorie);
+        assertEquals("Nouvelle Catégorie", addedCategorie.getNom());
     }
 
     @Test
-    public void testGetAllCategories() throws SQLException {
-        when(mockResultSet.next()).thenReturn(true, false);
-        when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getString("nom")).thenReturn("Catégorie 1");
-
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+    public void testGetAllCategories() {
+        // Ajoutez quelques catégories pour le test
+        categorieDAO.addCategorie(new Categorie("Catégorie 1"));
+        categorieDAO.addCategorie(new Categorie("Catégorie 2"));
 
         List<Categorie> categories = categorieDAO.getAllCategories();
         assertNotNull(categories);
-        assertEquals(1, categories.size());
-        assertEquals("Catégorie 1", categories.get(0).getNom());
+        assertEquals(2, categories.size());
     }
 
     @Test
-    public void testGetCategorieById() throws SQLException {
-        int id = 1;
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getString("nom")).thenReturn("Catégorie Test");
+    public void testGetCategorieById() {
+        // Ajoutez une catégorie pour le test
+        Categorie categorie = new Categorie("Catégorie Test");
+        categorieDAO.addCategorie(categorie);
 
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-
-        Categorie categorie = categorieDAO.getCategorieById(id);
-        assertNotNull(categorie);
-        assertEquals("Catégorie Test", categorie.getNom());
+        Categorie retrievedCategorie = categorieDAO.getCategorieById(categorie.getId());
+        assertNotNull(retrievedCategorie);
+        assertEquals("Catégorie Test", retrievedCategorie.getNom());
     }
 
     @Test
-    public void testUpdateCategorie() throws SQLException {
-        Categorie categorie = new Categorie( "Catégorie à Mettre à Jour");
+    public void testUpdateCategorie() {
+        // Ajoutez une catégorie pour le test
+        Categorie categorie = new Categorie("Catégorie à Mettre à Jour");
+        categorieDAO.addCategorie(categorie);
 
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
+        // Mettez à jour la catégorie
+        categorie.setNom("Nouveau Nom");
         boolean result = categorieDAO.updateCategorie(categorie);
         assertTrue(result);
 
-        verify(mockPreparedStatement).setString(1, "Catégorie à Mettre à Jour");
-        verify(mockPreparedStatement).setInt(2, 1);
-        verify(mockPreparedStatement).executeUpdate();
+        // Vérifiez que la catégorie a été mise à jour
+        Categorie updatedCategorie = categorieDAO.getCategorieById(categorie.getId());
+        assertEquals("Nouveau Nom", updatedCategorie.getNom());
     }
 
+    @Test
+    public void testDeleteCategorie() {
+        // Ajoutez une catégorie pour le test
+        Categorie categorie = new Categorie("Catégorie à Supprimer");
+        categorieDAO.addCategorie(categorie);
 
+        boolean result = categorieDAO.deleteCategorie(categorie.getId());
+        assertTrue(result);
+
+        // Vérifiez que la catégorie a été supprimée
+        Categorie deletedCategorie = categorieDAO.getCategorieById(categorie.getId());
+        assertNull(deletedCategorie);
+    }
 }

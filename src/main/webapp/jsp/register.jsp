@@ -9,6 +9,9 @@
 </head>
 <body>
 
+<!-- Bouton retour -->
+<button onclick="history.back()" class="back-button">← Retour</button>
+
 <!-- Navbar -->
 <header>
   <div class="navbar">
@@ -52,6 +55,25 @@
     <p>Déjà un compte ? <a href="<%=request.getContextPath()%>/jsp/login.jsp">Se connecter</a></p>
   </form>
 </div>
+
+<!-- Style CSS pour le bouton retour -->
+<style>
+  .back-button {
+    background-color: #f1f1f1;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border-radius: 5px;
+  }
+
+  .back-button:hover {
+    background-color: #ddd;
+  }
+</style>
 
 </body>
 </html>

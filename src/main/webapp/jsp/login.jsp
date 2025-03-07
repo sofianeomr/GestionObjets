@@ -9,6 +9,9 @@
 </head>
 <body>
 
+<!-- Bouton retour -->
+<button onclick="history.back()" class="back-button">← Retour</button>
+
 <!-- Formulaire de connexion -->
 <div class="form-container">
     <% String errorParam = request.getParameter("error"); %>
@@ -28,6 +31,25 @@
         <p>Pas encore inscrit ? <a href="<%=request.getContextPath()%>/jsp/register.jsp">Créer un compte</a></p>
     </form>
 </div>
+
+<!-- Style CSS pour le bouton retour -->
+<style>
+    .back-button {
+        background-color: #f1f1f1;
+        border: none;
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        border-radius: 5px;
+    }
+
+    .back-button:hover {
+        background-color: #ddd;
+    }
+</style>
 
 </body>
 </html>
