@@ -132,6 +132,7 @@ public class ExchangeDAO {
     }
 
     public List<Exchange> getSentRequestsByUserId(int userId) {
+
         List<Exchange> exchanges = new ArrayList<>();
         String sql = "SELECT * FROM exchanges WHERE demandeur_id = ?";
         try (Connection connection = ConnexionDatabase.getConnection();
