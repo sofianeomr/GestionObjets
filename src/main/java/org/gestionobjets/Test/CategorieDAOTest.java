@@ -1,4 +1,4 @@
-package org.gestionobjets.dao.Test;
+package org.gestionobjets.Test;
 
 import org.gestionobjets.dao.CategorieDAO;
 import org.gestionobjets.models.Categorie;

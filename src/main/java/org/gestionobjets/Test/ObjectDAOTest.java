@@ -1,6 +1,8 @@
-package org.gestionobjets.dao.Test;
+package org.gestionobjets.Test;
 
-import org.gestionobjets.dao.UserDAO;
+import org.gestionobjets.dao.ObjectDAO;
+import org.gestionobjets.models.Categorie;
+import org.gestionobjets.models.Objet;
 import org.gestionobjets.models.Utilisateur;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,9 +15,9 @@ import java.sql.SQLException;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class UserDAOTest {
+public class ObjectDAOTest {
 
-    private UserDAO userDAO;
+    private ObjectDAO objectDAO;
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
@@ -28,7 +30,7 @@ public class UserDAOTest {
 
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
 
-        userDAO = new UserDAO() {
+        objectDAO = new ObjectDAO() {
             protected Connection getConnection() {
                 return mockConnection;
             }
@@ -36,33 +38,33 @@ public class UserDAOTest {
     }
 
     @Test
-    public void testRegisterUser() throws SQLException {
-        Utilisateur user = new Utilisateur("NomTest", "emailTest@example.com", "passwordTest");
+    public void testAddObject() throws SQLException {
+        Categorie categorie = new Categorie("Catégorie Test");
+        Utilisateur proprietaire = new Utilisateur(3, "NomTest", "emailTest@example.com", "passwordTest");
+        Objet objet = new Objet("Objet Test", "Description", categorie, proprietaire);
 
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
-        boolean result = userDAO.registerUser(user);
+        boolean result = objectDAO.addObject(objet);
         assertTrue(result);
 
-        verify(mockPreparedStatement).setString(1, "NomTest");
-        verify(mockPreparedStatement).setString(2, "emailTest@example.com");
-        verify(mockPreparedStatement).setString(3, "passwordTest");
+        verify(mockPreparedStatement).setString(1, "Objet Test");
+        verify(mockPreparedStatement).setString(3, "Description");
         verify(mockPreparedStatement).executeUpdate();
     }
 
     @Test
-    public void testConnexionUser() throws SQLException {
-        String email = "emailTest@example.com";
-        String motDePasse = "passwordTest";
+    public void testGetObjectById() throws SQLException {
+        int objectId = 1;
 
         when(mockResultSet.next()).thenReturn(true);
         when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getString("nom")).thenReturn("NomTest");
+        when(mockResultSet.getString("nom")).thenReturn("Objet Test");
 
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
-        Utilisateur user = userDAO.connexionUser(email, motDePasse);
-        assertNotNull(user);
-        assertEquals("NomTest", user.getNom());
+        Objet objet = objectDAO.getObjectById(objectId);
+        assertNotNull(objet);
+        assertEquals("Objet Test", objet.getNom());
     }
 }

@@ -1,5 +1,9 @@
-package org.gestionobjets;
+package org.gestionobjets.Test;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,9 +15,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
 public class SeleniumFirefox {
-    private static WebDriver driver;
+    private WebDriver driver;
 
-    public SeleniumFirefox() {
+    @Before
+    public void setUp() {
         // Spécifier le chemin vers geckodriver
         System.setProperty("webdriver.gecko.driver", "C:\\geckodriver.exe");
 
@@ -24,45 +29,39 @@ public class SeleniumFirefox {
         driver = new FirefoxDriver(options);
     }
 
-    public void close() {
+    @After
+    public void tearDown() {
         if (driver != null) {
             driver.quit();
         }
     }
 
-    public static void testRegisterUser() {
+    @Test
+    public void testRegisterUser() {
         driver.get("http://localhost:8081/GestionObjets_war/jsp/registration.jsp");
 
-        // Use WebDriverWait to wait for elements to be present
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        // Fill in the registration form
         WebElement nomField = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("nom")));
         nomField.sendKeys("Test User");
 
         WebElement emailField = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("email")));
-        emailField.sendKeys("testuser@example.com");
+        emailField.sendKeys("testuserSelinium@example.com");
 
         WebElement passwordField = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("motDePasse")));
         passwordField.sendKeys("password123");
 
-        // Wait for the submit button to be clickable and then click it
         WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']")));
         submitButton.click();
 
-        // Verify the redirection after registration
         String currentUrl = driver.getCurrentUrl();
-        if (currentUrl.contains("login.jsp")) {
-            System.out.println("Test d'inscription réussi.");
-        } else {
-            System.out.println("Test d'inscription échoué.");
-        }
+        Assert.assertTrue("Registration failed.", currentUrl.contains("login.jsp"));
     }
 
+    @Test
     public void testLoginUser() {
         driver.get("http://localhost:8081/GestionObjets_war/jsp/login.jsp");
 
-        // Remplir le formulaire de connexion
         WebElement emailField = driver.findElement(By.name("email"));
         emailField.sendKeys("testuser@example.com");
 
@@ -72,83 +71,71 @@ public class SeleniumFirefox {
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        // Vérifier la redirection après la connexion
         String currentUrl = driver.getCurrentUrl();
-        if (currentUrl.contains("objets.jsp")) {
-            System.out.println("Test de connexion réussi.");
-        } else {
-            System.out.println("Test de connexion échoué.");
-        }
+        Assert.assertTrue("Login failed.", currentUrl.contains("objets.jsp"));
     }
 
+    @Test
     public void testCreateObject() {
-        testLoginUser(); // Se connecter d'abord
+        testLoginUser(); // Ensure the user is logged in
 
-        driver.get("http://localhost:8081/GestionObjets_war/jsp/createObject.jsp");
+        driver.get("http://localhost:8081/GestionObjets_war/jsp/objets.jsp");
 
-        // Remplir le formulaire de création d'objet
-        WebElement nomField = driver.findElement(By.name("nom"));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement createObjectButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.create-object-btn")));
+        createObjectButton.click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("createObjectModal")));
+
+        WebElement nomField = driver.findElement(By.id("objectName"));
         nomField.sendKeys("Objet Test");
 
-        WebElement categorieField = driver.findElement(By.name("categorie_id"));
-        categorieField.sendKeys("1");
-
-        WebElement descriptionField = driver.findElement(By.name("description"));
+        WebElement descriptionField = driver.findElement(By.id("objectDescription"));
         descriptionField.sendKeys("Description de l'objet test");
+
+        WebElement categorieField = driver.findElement(By.id("objectCategory"));
+        categorieField.sendKeys("3"); // Assuming "3" is the value for a valid category
 
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        // Vérifier que l'objet est ajouté
-        String currentUrl = driver.getCurrentUrl();
-        if (currentUrl.contains("objets.jsp")) {
-            System.out.println("Test de création d'objet réussi.");
-        } else {
-            System.out.println("Test de création d'objet échoué.");
-        }
+        wait.until(ExpectedConditions.urlContains("objets.jsp"));
+        WebElement newObject = driver.findElement(By.xpath("//h3[text()='Objet Test']"));
+        Assert.assertTrue("Object not created successfully.", newObject.isDisplayed());
     }
 
+    @Test
     public void testListObjects() {
         testLoginUser(); // Se connecter d'abord
 
         driver.get("http://localhost:8081/GestionObjets_war/jsp/objets.jsp");
 
-        // Vérifier que les objets sont listés
         boolean objectsListed = driver.findElements(By.className("objet")).size() > 0;
-        if (objectsListed) {
-            System.out.println("Test de liste des objets réussi.");
-        } else {
-            System.out.println("Test de liste des objets échoué.");
-        }
+        Assert.assertTrue("No objects listed.", objectsListed);
     }
 
+    @Test
     public void testSearchObjects() {
         testLoginUser(); // Se connecter d'abord
 
         driver.get("http://localhost:8081/GestionObjets_war/jsp/search.jsp");
 
-        // Remplir le formulaire de recherche
         WebElement keywordField = driver.findElement(By.name("keyword"));
         keywordField.sendKeys("Test");
 
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        // Vérifier que les résultats de recherche sont affichés
         boolean resultsFound = driver.findElements(By.className("objet")).size() > 0;
-        if (resultsFound) {
-            System.out.println("Test de recherche d'objets réussi.");
-        } else {
-            System.out.println("Test de recherche d'objets échoué.");
-        }
+        Assert.assertTrue("No search results found.", resultsFound);
     }
 
+    @Test
     public void testRequestExchange() {
         testLoginUser(); // Se connecter d'abord
 
         driver.get("http://localhost:8081/GestionObjets_war/jsp/requestExchange.jsp");
 
-        // Remplir le formulaire de demande d'échange
         WebElement objectIdField = driver.findElement(By.name("objectId"));
         objectIdField.sendKeys("1");
 
@@ -158,21 +145,16 @@ public class SeleniumFirefox {
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        // Vérifier que la demande d'échange est enregistrée
         String currentUrl = driver.getCurrentUrl();
-        if (currentUrl.contains("objets.jsp")) {
-            System.out.println("Test de demande d'échange réussi.");
-        } else {
-            System.out.println("Test de demande d'échange échoué.");
-        }
+        Assert.assertTrue("Exchange request failed.", currentUrl.contains("objets.jsp"));
     }
 
+    @Test
     public void testManageExchange() {
         testLoginUser(); // Se connecter d'abord
 
         driver.get("http://localhost:8081/GestionObjets_war/jsp/manageExchange.jsp");
 
-        // Accepter une demande d'échange
         WebElement exchangeIdField = driver.findElement(By.name("exchangeId"));
         exchangeIdField.sendKeys("1");
 
@@ -182,58 +164,17 @@ public class SeleniumFirefox {
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        // Vérifier que la demande d'échange est mise à jour
         String currentUrl = driver.getCurrentUrl();
-        if (currentUrl.contains("dashboard.jsp")) {
-            System.out.println("Test de gestion d'échange réussi.");
-        } else {
-            System.out.println("Test de gestion d'échange échoué.");
-        }
+        Assert.assertTrue("Exchange management failed.", currentUrl.contains("dashboard.jsp"));
     }
 
+    @Test
     public void testShowExchangeHistory() {
         testLoginUser(); // Se connecter d'abord
 
         driver.get("http://localhost:8081/GestionObjets_war/jsp/history.jsp");
 
-        // Vérifier que l'historique des échanges est affiché
         boolean historyDisplayed = driver.findElements(By.className("exchange")).size() > 0;
-        if (historyDisplayed) {
-            System.out.println("Test d'historique des échanges réussi.");
-        } else {
-            System.out.println("Test d'historique des échanges échoué.");
-        }
-    }
-
-    public static void main(String[] args) {
-        SeleniumFirefox testSuite = new SeleniumFirefox();
-
-        try {
-            System.out.println("Exécution du test : testRegisterUser");
-            testSuite.testRegisterUser();
-
-            System.out.println("Exécution du test : testLoginUser");
-            testSuite.testLoginUser();
-
-            System.out.println("Exécution du test : testCreateObject");
-            testSuite.testCreateObject();
-
-            System.out.println("Exécution du test : testListObjects");
-            testSuite.testListObjects();
-
-            System.out.println("Exécution du test : testSearchObjects");
-            testSuite.testSearchObjects();
-
-            System.out.println("Exécution du test : testRequestExchange");
-            testSuite.testRequestExchange();
-
-            System.out.println("Exécution du test : testManageExchange");
-            testSuite.testManageExchange();
-
-            System.out.println("Exécution du test : testShowExchangeHistory");
-            testSuite.testShowExchangeHistory();
-        } finally {
-            testSuite.close();
-        }
+        Assert.assertTrue("Exchange history not displayed.", historyDisplayed);
     }
 }

@@ -1,4 +1,4 @@
-package org.gestionobjets.dao.Test;
+package org.gestionobjets.Test;
 
 import org.gestionobjets.dao.ExchangeDAO;
 import org.gestionobjets.models.Exchange;
